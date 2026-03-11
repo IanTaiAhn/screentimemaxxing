@@ -136,7 +136,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
   - Function: `resolveAvatarState(brainrotHours, midHours, enrichmentHours): AvatarState`
   - Write unit tests for each state resolution path
 
-- [ ] **Task 5.2 — Avatar Visual Assets (Placeholder)**
+- [x] **Task 5.2 — Avatar Visual Assets (Placeholder)**
   - Create 4 placeholder avatar images (simple colored rectangles or basic illustrations)
     - One per avatar state, clearly labeled
   - Place in `res/drawable/`

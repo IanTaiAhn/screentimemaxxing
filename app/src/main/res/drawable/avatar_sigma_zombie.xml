@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder avatar for SigmaZombie (dominant BRAINROT usage >60%) -->
+<!-- Replace with real art post-MVP -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Background rectangle: blood red to represent brainrot -->
+    <path
+        android:pathData="M0,0 L200,0 L200,200 L0,200 Z"
+        android:fillColor="#8B0000" />
+
+    <!-- Inner face shape -->
+    <path
+        android:pathData="M60,40 L140,40 L140,160 L60,160 Z"
+        android:fillColor="#C41E3A" />
+
+    <!-- Glazed eyes (left) -->
+    <path
+        android:pathData="M75,80 A10,10 0 1,0 95,80 A10,10 0 1,0 75,80 Z"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M82,80 A3,3 0 1,0 88,80 A3,3 0 1,0 82,80 Z"
+        android:fillColor="#FF0000" />
+
+    <!-- Glazed eyes (right) -->
+    <path
+        android:pathData="M105,80 A10,10 0 1,0 125,80 A10,10 0 1,0 105,80 Z"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M112,80 A3,3 0 1,0 118,80 A3,3 0 1,0 112,80 Z"
+        android:fillColor="#FF0000" />
+
+    <!-- Drooling mouth -->
+    <path
+        android:pathData="M80,115 Q100,130 120,115"
+        android:fillColor="#00000000"
+        android:strokeColor="#AAAAAA"
+        android:strokeWidth="3" />
+
+    <!-- Label bar at bottom -->
+    <path
+        android:pathData="M0,165 L200,165 L200,200 L0,200 Z"
+        android:fillColor="#3D0000" />
+
+</vector>
