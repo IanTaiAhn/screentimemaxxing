@@ -8,7 +8,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
 
 ## Phase 1: Project Setup
 
-- [ ] **Task 1.1 — Initialize Android Project**
+- [x] **Task 1.1 — Initialize Android Project**
   - Create a new Android project in Android Studio
   - Package name: `com.brainrotrpg`
   - Min SDK: API 29 (Android 10)
@@ -16,7 +16,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
   - Build system: Gradle (Kotlin DSL)
   - Enable Jetpack Compose in `build.gradle.kts`
 
-- [ ] **Task 1.2 — Add Dependencies**
+- [x] **Task 1.2 — Add Dependencies**
   - Add to `build.gradle.kts`:
     - `androidx.room` (runtime, ktx, compiler)
     - `androidx.work` (WorkManager runtime-ktx)
@@ -24,7 +24,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     - `kotlinx.coroutines` (android)
   - Sync and confirm build passes with no errors
 
-- [ ] **Task 1.3 — Configure Permissions in AndroidManifest**
+- [x] **Task 1.3 — Configure Permissions in AndroidManifest**
   - Add `PACKAGE_USAGE_STATS` permission
   - Add `FOREGROUND_SERVICE` permission
   - Add `RECEIVE_BOOT_COMPLETED` permission
@@ -35,13 +35,13 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
 
 ## Phase 2: Usage Tracking
 
-- [ ] **Task 2.1 — Permission Check & Deep Link**
+- [x] **Task 2.1 — Permission Check & Deep Link**
   - Create `UsagePermissionHelper.kt`
   - Function: `hasUsagePermission(context): Boolean` — checks if `PACKAGE_USAGE_STATS` is granted
   - Function: `openUsageAccessSettings(context)` — deep links to Settings > Special App Access > Usage Access
   - Write a unit test confirming the permission check returns false when not granted
 
-- [ ] **Task 2.2 — App Category Map**
+- [x] **Task 2.2 — App Category Map**
   - Create `AppCategories.kt`
   - Define a `Category` enum: `BRAINROT`, `MID`, `ENRICHMENT`, `UNTRACKED`
   - Define a `packageCategoryMap: Map<String, Category>` with at least:
@@ -50,7 +50,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     - Spotify, Audible, Google Podcasts → ENRICHMENT
   - Write a unit test confirming known packages return the correct category
 
-- [ ] **Task 2.3 — UsageStatsManager Reader**
+- [x] **Task 2.3 — UsageStatsManager Reader**
   - Create `UsageStatsReader.kt`
   - Function: `getUsageSince(context, sinceMillis): Map<String, Long>`
     - Returns map of packageName → foregroundTimeMillis for all apps used since `sinceMillis`
@@ -58,7 +58,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     - Calls `getUsageSince`, maps packages through `AppCategories`, sums by category
   - Handle the case where permission is not granted (return empty map, log warning)
 
-- [ ] **Task 2.4 — Mock Data Layer**
+- [x] **Task 2.4 — Mock Data Layer**
   - Create `MockUsageStatsReader.kt`
   - Implements the same interface as `UsageStatsReader`
   - Returns hardcoded fake data (e.g. 3 hours TikTok, 1 hour Spotify)
@@ -69,11 +69,11 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
 
 ## Phase 3: Local Database (Room)
 
-- [ ] **Task 3.1 — Define Room Entities**
+- [x] **Task 3.1 — Define Room Entities**
   - Create `UsageRecord.kt` — entity with fields: `id`, `timestamp`, `category`, `durationMillis`
   - Create `PlayerStats.kt` — entity with fields: `id` (singleton, always 1), `totalXp`, `level`, `brainrotHours`, `midHours`, `enrichmentHours`, `lastCheckedTimestamp`
 
-- [ ] **Task 3.2 — Create DAOs**
+- [x] **Task 3.2 — Create DAOs**
   - Create `UsageRecordDao.kt`
     - `insert(record: UsageRecord)`
     - `getRecordsSince(timestamp: Long): List<UsageRecord>`
@@ -91,7 +91,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
 
 ## Phase 4: Background Worker
 
-- [ ] **Task 4.1 — Create UsageTrackingWorker**
+- [x] **Task 4.1 — Create UsageTrackingWorker**
   - Create `UsageTrackingWorker.kt` extending `CoroutineWorker`
   - On each run:
     1. Read `lastCheckedTimestamp` from `PlayerStats`
@@ -100,7 +100,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     4. Update `PlayerStats` — add hours, recalculate XP, update timestamp
   - Return `Result.success()` on completion, `Result.retry()` on failure
 
-- [ ] **Task 4.2 — XP & Level Calculation**
+- [x] **Task 4.2 — XP & Level Calculation**
   - Create `XpEngine.kt`
   - Function: `calculateXp(brainrotHours, midHours, enrichmentHours): Long`
     - All hours contribute equally to XP (1 hour = 100 XP)
@@ -108,7 +108,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     - Simple threshold table: Level 1 = 0 XP, Level 2 = 500 XP, Level 3 = 1200 XP, etc.
   - Write unit tests for both functions with known inputs/outputs
 
-- [ ] **Task 4.3 — Schedule WorkManager Job**
+- [x] **Task 4.3 — Schedule WorkManager Job**
   - Create `WorkScheduler.kt`
   - Function: `schedulePeriodicTracking(context)`
     - Uses `PeriodicWorkRequestBuilder` with 15-minute interval
