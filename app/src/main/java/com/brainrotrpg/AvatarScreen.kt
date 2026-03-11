@@ -3,6 +3,7 @@ package com.brainrotrpg
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -96,6 +97,75 @@ private fun AvatarScreenContent(
             ),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        StatsBreakdownSection(
+            brainrotHours = uiState.brainrotHours,
+            midHours = uiState.midHours,
+            enrichmentHours = uiState.enrichmentHours,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun StatsBreakdownSection(
+    brainrotHours: Float,
+    midHours: Float,
+    enrichmentHours: Float,
+    modifier: Modifier = Modifier
+) {
+    val totalHours = brainrotHours + midHours + enrichmentHours
+
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(R.string.stats_section_title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        StatRow(
+            label = stringResource(R.string.stat_brainrot),
+            hours = brainrotHours,
+            fraction = if (totalHours > 0f) brainrotHours / totalHours else 0f
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        StatRow(
+            label = stringResource(R.string.stat_mid),
+            hours = midHours,
+            fraction = if (totalHours > 0f) midHours / totalHours else 0f
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        StatRow(
+            label = stringResource(R.string.stat_enrichment),
+            hours = enrichmentHours,
+            fraction = if (totalHours > 0f) enrichmentHours / totalHours else 0f
+        )
+    }
+}
+
+@Composable
+private fun StatRow(
+    label: String,
+    hours: Float,
+    fraction: Float,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = label, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = stringResource(R.string.stat_hours, hours),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        LinearProgressIndicator(
+            progress = { fraction },
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
