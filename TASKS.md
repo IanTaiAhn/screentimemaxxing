@@ -8,7 +8,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
 
 ## Phase 1: Project Setup
 
-- [ ] **Task 1.1 — Initialize Android Project**
+- [x] **Task 1.1 — Initialize Android Project**
   - Create a new Android project in Android Studio
   - Package name: `com.brainrotrpg`
   - Min SDK: API 29 (Android 10)
