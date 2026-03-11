@@ -73,7 +73,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
   - Create `UsageRecord.kt` — entity with fields: `id`, `timestamp`, `category`, `durationMillis`
   - Create `PlayerStats.kt` — entity with fields: `id` (singleton, always 1), `totalXp`, `level`, `brainrotHours`, `midHours`, `enrichmentHours`, `lastCheckedTimestamp`
 
-- [ ] **Task 3.2 — Create DAOs**
+- [x] **Task 3.2 — Create DAOs**
   - Create `UsageRecordDao.kt`
     - `insert(record: UsageRecord)`
     - `getRecordsSince(timestamp: Long): List<UsageRecord>`
