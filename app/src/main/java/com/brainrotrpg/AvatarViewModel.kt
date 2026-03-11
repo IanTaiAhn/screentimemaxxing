@@ -14,6 +14,7 @@ data class AvatarUiState(
     val level: Int = 1,
     val totalXp: Long = 0L,
     val xpToNextLevel: Long = 500L,
+    val xpProgressFraction: Float = 0f,
     val avatarState: AvatarState = AvatarState.Hybrid,
     val brainrotHours: Float = 0f,
     val midHours: Float = 0f,
@@ -32,15 +33,24 @@ class AvatarViewModel(
             initialValue = AvatarUiState()
         )
 
-    private fun PlayerStats.toUiState(): AvatarUiState = AvatarUiState(
-        level = level,
-        totalXp = totalXp,
-        xpToNextLevel = XpEngine.xpToNextLevel(totalXp),
-        avatarState = resolveAvatarState(brainrotHours, midHours, enrichmentHours),
-        brainrotHours = brainrotHours,
-        midHours = midHours,
-        enrichmentHours = enrichmentHours
-    )
+    private fun PlayerStats.toUiState(): AvatarUiState {
+        val xpRemaining = XpEngine.xpToNextLevel(totalXp)
+        val levelStart = XpEngine.currentLevelThreshold(totalXp)
+        val xpEarnedInLevel = totalXp - levelStart
+        val totalXpForLevel = xpEarnedInLevel + xpRemaining
+        val progressFraction = if (totalXpForLevel == 0L) 1f
+            else xpEarnedInLevel.toFloat() / totalXpForLevel.toFloat()
+        return AvatarUiState(
+            level = level,
+            totalXp = totalXp,
+            xpToNextLevel = xpRemaining,
+            xpProgressFraction = progressFraction,
+            avatarState = resolveAvatarState(brainrotHours, midHours, enrichmentHours),
+            brainrotHours = brainrotHours,
+            midHours = midHours,
+            enrichmentHours = enrichmentHours
+        )
+    }
 
     companion object {
         fun factory(playerStatsDao: PlayerStatsDao): ViewModelProvider.Factory =
