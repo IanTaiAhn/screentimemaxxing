@@ -24,7 +24,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     - `kotlinx.coroutines` (android)
   - Sync and confirm build passes with no errors
 
-- [ ] **Task 1.3 — Configure Permissions in AndroidManifest**
+- [x] **Task 1.3 — Configure Permissions in AndroidManifest**
   - Add `PACKAGE_USAGE_STATS` permission
   - Add `FOREGROUND_SERVICE` permission
   - Add `RECEIVE_BOOT_COMPLETED` permission
