@@ -108,7 +108,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     - Simple threshold table: Level 1 = 0 XP, Level 2 = 500 XP, Level 3 = 1200 XP, etc.
   - Write unit tests for both functions with known inputs/outputs
 
-- [ ] **Task 4.3 — Schedule WorkManager Job**
+- [x] **Task 4.3 — Schedule WorkManager Job**
   - Create `WorkScheduler.kt`
   - Function: `schedulePeriodicTracking(context)`
     - Uses `PeriodicWorkRequestBuilder` with 15-minute interval
