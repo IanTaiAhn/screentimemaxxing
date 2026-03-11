@@ -41,7 +41,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
   - Function: `openUsageAccessSettings(context)` — deep links to Settings > Special App Access > Usage Access
   - Write a unit test confirming the permission check returns false when not granted
 
-- [ ] **Task 2.2 — App Category Map**
+- [x] **Task 2.2 — App Category Map**
   - Create `AppCategories.kt`
   - Define a `Category` enum: `BRAINROT`, `MID`, `ENRICHMENT`, `UNTRACKED`
   - Define a `packageCategoryMap: Map<String, Category>` with at least:
