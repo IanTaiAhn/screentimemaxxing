@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BrainRot RPG</string>
+    <string name="permission_title">Usage Access Required</string>
+    <string name="permission_explanation">BrainRot RPG needs permission to read your app usage stats. This lets us track your screen time and evolve your avatar based on how you use your phone.</string>
+    <string name="permission_cta">Enable Usage Access</string>
 </resources>
