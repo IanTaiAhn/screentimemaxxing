@@ -58,7 +58,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     - Calls `getUsageSince`, maps packages through `AppCategories`, sums by category
   - Handle the case where permission is not granted (return empty map, log warning)
 
-- [ ] **Task 2.4 — Mock Data Layer**
+- [x] **Task 2.4 — Mock Data Layer**
   - Create `MockUsageStatsReader.kt`
   - Implements the same interface as `UsageStatsReader`
   - Returns hardcoded fake data (e.g. 3 hours TikTok, 1 hour Spotify)
