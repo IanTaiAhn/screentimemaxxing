@@ -100,7 +100,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     4. Update `PlayerStats` — add hours, recalculate XP, update timestamp
   - Return `Result.success()` on completion, `Result.retry()` on failure
 
-- [ ] **Task 4.2 — XP & Level Calculation**
+- [x] **Task 4.2 — XP & Level Calculation**
   - Create `XpEngine.kt`
   - Function: `calculateXp(brainrotHours, midHours, enrichmentHours): Long`
     - All hours contribute equally to XP (1 hour = 100 XP)
