@@ -35,7 +35,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
 
 ## Phase 2: Usage Tracking
 
-- [ ] **Task 2.1 — Permission Check & Deep Link**
+- [x] **Task 2.1 — Permission Check & Deep Link**
   - Create `UsagePermissionHelper.kt`
   - Function: `hasUsagePermission(context): Boolean` — checks if `PACKAGE_USAGE_STATS` is granted
   - Function: `openUsageAccessSettings(context)` — deep links to Settings > Special App Access > Usage Access
