@@ -116,7 +116,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
   - Call `schedulePeriodicTracking` from `Application.onCreate()`
   - Create `Application` subclass and register it in `AndroidManifest.xml`
 
-- [ ] **Task 4.4 — Boot Receiver**
+- [x] **Task 4.4 — Boot Receiver**
   - Create `BootReceiver.kt` extending `BroadcastReceiver`
   - On `BOOT_COMPLETED` intent, call `WorkScheduler.schedulePeriodicTracking(context)`
   - Register in manifest with `RECEIVE_BOOT_COMPLETED` intent filter
