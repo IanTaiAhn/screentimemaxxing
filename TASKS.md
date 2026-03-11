@@ -50,7 +50,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
     - Spotify, Audible, Google Podcasts → ENRICHMENT
   - Write a unit test confirming known packages return the correct category
 
-- [ ] **Task 2.3 — UsageStatsManager Reader**
+- [x] **Task 2.3 — UsageStatsManager Reader**
   - Create `UsageStatsReader.kt`
   - Function: `getUsageSince(context, sinceMillis): Map<String, Long>`
     - Returns map of packageName → foregroundTimeMillis for all apps used since `sinceMillis`
