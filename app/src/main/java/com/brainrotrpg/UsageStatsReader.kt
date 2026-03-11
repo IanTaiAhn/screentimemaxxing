@@ -4,11 +4,11 @@ import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.util.Log
 
-object UsageStatsReader {
+object UsageStatsReader : IUsageStatsReader {
 
     private const val TAG = "UsageStatsReader"
 
-    fun getUsageSince(context: Context, sinceMillis: Long): Map<String, Long> {
+    override fun getUsageSince(context: Context, sinceMillis: Long): Map<String, Long> {
         if (!UsagePermissionHelper.hasUsagePermission(context)) {
             Log.w(TAG, "Usage stats permission not granted. Returning empty map.")
             return emptyMap()
@@ -28,7 +28,7 @@ object UsageStatsReader {
             .fold(0L) { acc, stats -> acc + stats.totalTimeInForeground }
     }
 
-    fun getCategorizedUsage(context: Context, sinceMillis: Long): Map<Category, Long> {
+    override fun getCategorizedUsage(context: Context, sinceMillis: Long): Map<Category, Long> {
         val usageMap = getUsageSince(context, sinceMillis)
         return aggregateCategorizedUsage(usageMap)
     }
