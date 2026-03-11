@@ -69,7 +69,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
 
 ## Phase 3: Local Database (Room)
 
-- [ ] **Task 3.1 — Define Room Entities**
+- [x] **Task 3.1 — Define Room Entities**
   - Create `UsageRecord.kt` — entity with fields: `id`, `timestamp`, `category`, `durationMillis`
   - Create `PlayerStats.kt` — entity with fields: `id` (singleton, always 1), `totalXp`, `level`, `brainrotHours`, `midHours`, `enrichmentHours`, `lastCheckedTimestamp`
 
