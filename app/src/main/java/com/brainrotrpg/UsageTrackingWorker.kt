@@ -53,10 +53,8 @@ class UsageTrackingWorker(
             val newMidHours = (currentStats?.midHours ?: 0f) + midDeltaHours
             val newEnrichmentHours = (currentStats?.enrichmentHours ?: 0f) + enrichmentDeltaHours
 
-            // XP: 1 hour = 100 XP for all categories (will be encapsulated by XpEngine in Task 4.2)
-            val totalHours = newBrainrotHours + newMidHours + newEnrichmentHours
-            val newTotalXp = (totalHours * 100).toLong()
-            val newLevel = calculateLevel(newTotalXp)
+            val newTotalXp = XpEngine.calculateXp(newBrainrotHours, newMidHours, newEnrichmentHours)
+            val newLevel = XpEngine.calculateLevel(newTotalXp)
 
             val updatedStats = PlayerStats(
                 id = 1,
@@ -77,14 +75,4 @@ class UsageTrackingWorker(
         }
     }
 
-    // Placeholder level thresholds — will be replaced by XpEngine in Task 4.2
-    private fun calculateLevel(totalXp: Long): Int {
-        return when {
-            totalXp >= 3000 -> 5
-            totalXp >= 2000 -> 4
-            totalXp >= 1200 -> 3
-            totalXp >= 500 -> 2
-            else -> 1
-        }
-    }
 }
