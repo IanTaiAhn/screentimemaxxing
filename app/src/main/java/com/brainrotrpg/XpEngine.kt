@@ -33,4 +33,10 @@ object XpEngine {
         }
         return level
     }
+
+    fun xpToNextLevel(totalXp: Long): Long {
+        val level = calculateLevel(totalXp)
+        return if (level >= LEVEL_THRESHOLDS.size) 0L
+        else LEVEL_THRESHOLDS[level] - totalXp
+    }
 }

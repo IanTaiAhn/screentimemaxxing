@@ -142,7 +142,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
   - Place in `res/drawable/`
   - These are replaced with real art post-MVP — placeholders are fine for now
 
-- [ ] **Task 5.3 — AvatarViewModel**
+- [x] **Task 5.3 — AvatarViewModel**
   - Create `AvatarViewModel.kt` extending `ViewModel`
   - Expose a `StateFlow<AvatarUiState>` where `AvatarUiState` contains:
     - `level: Int`
