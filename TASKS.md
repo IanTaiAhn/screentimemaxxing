@@ -91,7 +91,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
 
 ## Phase 4: Background Worker
 
-- [ ] **Task 4.1 — Create UsageTrackingWorker**
+- [x] **Task 4.1 — Create UsageTrackingWorker**
   - Create `UsageTrackingWorker.kt` extending `CoroutineWorker`
   - On each run:
     1. Read `lastCheckedTimestamp` from `PlayerStats`
