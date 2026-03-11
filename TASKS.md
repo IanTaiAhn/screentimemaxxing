@@ -126,7 +126,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
 
 ## Phase 5: Avatar System
 
-- [ ] **Task 5.1 — Define Avatar States**
+- [x] **Task 5.1 — Define Avatar States**
   - Create `AvatarState.kt`
   - Define a sealed class or enum with states:
     - `SigmaZombie` — dominant BRAINROT (>60% of hours)
