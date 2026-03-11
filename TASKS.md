@@ -16,7 +16,7 @@ Mark tasks `[x]` when complete. Do not skip tasks — later tasks depend on earl
   - Build system: Gradle (Kotlin DSL)
   - Enable Jetpack Compose in `build.gradle.kts`
 
-- [ ] **Task 1.2 — Add Dependencies**
+- [x] **Task 1.2 — Add Dependencies**
   - Add to `build.gradle.kts`:
     - `androidx.room` (runtime, ktx, compiler)
     - `androidx.work` (WorkManager runtime-ktx)
