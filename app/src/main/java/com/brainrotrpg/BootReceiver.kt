@@ -6,6 +6,8 @@ import android.content.Intent
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        // TODO (Task 4.4): Call WorkScheduler.schedulePeriodicTracking(context) here
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            WorkScheduler.schedulePeriodicTracking(context)
+        }
     }
 }
