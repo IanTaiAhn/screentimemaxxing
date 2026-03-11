@@ -4,18 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.brainrotrpg.ui.theme.BrainRotRPGTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,7 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             BrainRotRPGTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    HomeScreen(modifier = Modifier.padding(innerPadding))
+                    BrainRotNavHost(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -33,27 +31,31 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineLarge
-        )
-        Text(
-            text = "Your avatar awaits...",
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
+fun BrainRotNavHost(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val navController = rememberNavController()
+    val startDestination = if (UsagePermissionHelper.hasUsagePermission(context)) "avatar" else "permission"
 
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    BrainRotRPGTheme {
-        HomeScreen()
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier
+    ) {
+        composable("permission") {
+            PermissionScreen(
+                onPermissionGranted = {
+                    navController.navigate("avatar") {
+                        popUpTo("permission") { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable("avatar") {
+            val playerStatsDao = DatabaseProvider.getDatabase(context).playerStatsDao()
+            val avatarViewModel: AvatarViewModel = viewModel(
+                factory = AvatarViewModel.factory(playerStatsDao)
+            )
+            AvatarScreen(avatarViewModel = avatarViewModel)
+        }
     }
 }
