@@ -4,4 +4,15 @@
     <string name="permission_title">Usage Access Required</string>
     <string name="permission_explanation">BrainRot RPG needs permission to read your app usage stats. This lets us track your screen time and evolve your avatar based on how you use your phone.</string>
     <string name="permission_cta">Enable Usage Access</string>
+    <string name="avatar_class_sigma_zombie">Sigma Zombie</string>
+    <string name="avatar_class_extremely_online">Extremely Online</string>
+    <string name="avatar_class_fake_intellectual">Fake Intellectual</string>
+    <string name="avatar_class_hybrid">Hybrid</string>
+    <string name="level_badge">Level %d</string>
+    <string name="xp_progress">%1$d / %2$d XP</string>
+    <string name="stats_section_title">Stats</string>
+    <string name="stat_brainrot">🧟 Brainrot</string>
+    <string name="stat_mid">😐 Mid</string>
+    <string name="stat_enrichment">🎧 Enrichment</string>
+    <string name="stat_hours">%.1f hrs</string>
 </resources>
