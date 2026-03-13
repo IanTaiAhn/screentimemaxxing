@@ -51,11 +51,19 @@ fun BrainRotNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable("avatar") {
-            val playerStatsDao = DatabaseProvider.getDatabase(context).playerStatsDao()
+            val db = DatabaseProvider.getDatabase(context)
+            val playerStatsDao = db.playerStatsDao()
+            val roomObjectDao = db.roomObjectDao()
             val avatarViewModel: AvatarViewModel = viewModel(
                 factory = AvatarViewModel.factory(playerStatsDao)
             )
-            AvatarScreen(avatarViewModel = avatarViewModel)
+            val roomObjectViewModel: RoomObjectViewModel = viewModel(
+                factory = RoomObjectViewModel.factory(roomObjectDao, playerStatsDao)
+            )
+            AvatarScreen(
+                avatarViewModel = avatarViewModel,
+                roomObjectViewModel = roomObjectViewModel
+            )
         }
     }
 }

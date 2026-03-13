@@ -215,6 +215,7 @@ fun RoomScene(
     enrichmentHours: Float,
     placedObjects: List<RoomObject> = emptyList(),
     onObjectTapped: (RoomObject) -> Unit = {},
+    onFloorTapped: (Float, Float) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
     characterState: CharacterState = remember { CharacterState() }
 ) {
@@ -259,7 +260,7 @@ fun RoomScene(
                     if (tappedObject != null) {
                         onObjectTapped(tappedObject)   // interaction — don't walk
                     } else {
-                        characterState.setTarget(world.first, world.second)   // walk
+                        onFloorTapped(world.first, world.second)   // delegate to caller
                     }
                 }
             }
