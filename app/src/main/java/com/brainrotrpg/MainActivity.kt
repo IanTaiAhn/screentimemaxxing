@@ -69,6 +69,9 @@ fun BrainRotNavHost(modifier: Modifier = Modifier) {
                     navController.navigate("lifecycle_end") {
                         popUpTo("avatar") { inclusive = true }
                     }
+                },
+                onArchiveClick = {
+                    navController.navigate("archive")
                 }
             )
         }
@@ -76,8 +79,9 @@ fun BrainRotNavHost(modifier: Modifier = Modifier) {
             val db = DatabaseProvider.getDatabase(context)
             val lifecycleRecordDao = db.lifecycleRecordDao()
             val playerStatsDao = db.playerStatsDao()
+            val roomObjectDao = db.roomObjectDao()
             val viewModel: LifecycleViewModel = viewModel(
-                factory = LifecycleViewModel.factory(lifecycleRecordDao, playerStatsDao)
+                factory = LifecycleViewModel.factory(lifecycleRecordDao, playerStatsDao, roomObjectDao)
             )
             val mostRecentRecord by viewModel.mostRecentRecord.collectAsStateWithLifecycle()
             mostRecentRecord?.let { record ->
@@ -99,7 +103,7 @@ fun BrainRotNavHost(modifier: Modifier = Modifier) {
             val db = DatabaseProvider.getDatabase(context)
             val lifecycleRecordDao = db.lifecycleRecordDao()
             val viewModel: LifecycleViewModel = viewModel(
-                factory = LifecycleViewModel.factory(lifecycleRecordDao, db.playerStatsDao())
+                factory = LifecycleViewModel.factory(lifecycleRecordDao, db.playerStatsDao(), db.roomObjectDao())
             )
             ArchiveScreen(viewModel = viewModel)
         }
