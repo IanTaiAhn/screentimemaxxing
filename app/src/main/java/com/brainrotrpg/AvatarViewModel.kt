@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -34,6 +35,15 @@ class AvatarViewModel(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = AvatarUiState()
+        )
+
+    val pendingLifecycleEnd: StateFlow<Boolean> = playerStatsDao.observeStats()
+        .filterNotNull()
+        .map { stats -> stats.pendingLifecycleEnd }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
         )
 
     private fun PlayerStats.toUiState(): AvatarUiState {

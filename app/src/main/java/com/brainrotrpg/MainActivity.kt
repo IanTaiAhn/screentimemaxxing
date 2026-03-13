@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -62,8 +64,44 @@ fun BrainRotNavHost(modifier: Modifier = Modifier) {
             )
             AvatarScreen(
                 avatarViewModel = avatarViewModel,
-                roomObjectViewModel = roomObjectViewModel
+                roomObjectViewModel = roomObjectViewModel,
+                onLifecycleEnd = {
+                    navController.navigate("lifecycle_end") {
+                        popUpTo("avatar") { inclusive = true }
+                    }
+                }
             )
+        }
+        composable("lifecycle_end") {
+            val db = DatabaseProvider.getDatabase(context)
+            val lifecycleRecordDao = db.lifecycleRecordDao()
+            val playerStatsDao = db.playerStatsDao()
+            val viewModel: LifecycleViewModel = viewModel(
+                factory = LifecycleViewModel.factory(lifecycleRecordDao, playerStatsDao)
+            )
+            val mostRecentRecord by viewModel.mostRecentRecord.collectAsStateWithLifecycle()
+            mostRecentRecord?.let { record ->
+                LifecycleEndScreen(
+                    record = record,
+                    onBeginNewLife = {
+                        viewModel.beginNewLife()
+                        navController.navigate("avatar") {
+                            popUpTo("lifecycle_end") { inclusive = true }
+                        }
+                    },
+                    onViewArchive = {
+                        navController.navigate("archive")
+                    }
+                )
+            }
+        }
+        composable("archive") {
+            val db = DatabaseProvider.getDatabase(context)
+            val lifecycleRecordDao = db.lifecycleRecordDao()
+            val viewModel: LifecycleViewModel = viewModel(
+                factory = LifecycleViewModel.factory(lifecycleRecordDao, db.playerStatsDao())
+            )
+            ArchiveScreen(viewModel = viewModel)
         }
     }
 }
