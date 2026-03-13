@@ -18,7 +18,10 @@ data class AvatarUiState(
     val avatarState: AvatarState = AvatarState.Hybrid,
     val brainrotHours: Float = 0f,
     val midHours: Float = 0f,
-    val enrichmentHours: Float = 0f
+    val enrichmentHours: Float = 0f,
+    val spendableBrainrotHours: Float = 0f,
+    val spendableMidHours: Float = 0f,
+    val spendableEnrichmentHours: Float = 0f
 )
 
 class AvatarViewModel(
@@ -48,7 +51,10 @@ class AvatarViewModel(
             avatarState = resolveAvatarState(brainrotHours, midHours, enrichmentHours),
             brainrotHours = brainrotHours,
             midHours = midHours,
-            enrichmentHours = enrichmentHours
+            enrichmentHours = enrichmentHours,
+            spendableBrainrotHours = spendableBrainrotHours,
+            spendableMidHours = spendableMidHours,
+            spendableEnrichmentHours = spendableEnrichmentHours
         )
     }
 
