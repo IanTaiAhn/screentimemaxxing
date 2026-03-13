@@ -22,6 +22,20 @@ object XpEngine {
         return (totalHours * XP_PER_HOUR).toLong()
     }
 
+    fun calculateXpWithMultipliers(
+        brainrotHours: Float,
+        midHours: Float,
+        enrichmentHours: Float,
+        brainrotMultiplier: Float = 1f,
+        midMultiplier: Float = 1f,
+        enrichmentMultiplier: Float = 1f
+    ): Long {
+        val xp = (brainrotHours * XP_PER_HOUR * brainrotMultiplier) +
+                  (midHours * XP_PER_HOUR * midMultiplier) +
+                  (enrichmentHours * XP_PER_HOUR * enrichmentMultiplier)
+        return xp.toLong()
+    }
+
     fun calculateLevel(totalXp: Long): Int {
         var level = 1
         for (i in LEVEL_THRESHOLDS.indices) {

@@ -53,7 +53,42 @@ class UsageTrackingWorker(
             val newMidHours = (currentStats?.midHours ?: 0f) + midDeltaHours
             val newEnrichmentHours = (currentStats?.enrichmentHours ?: 0f) + enrichmentDeltaHours
 
-            val newTotalXp = XpEngine.calculateXp(newBrainrotHours, newMidHours, newEnrichmentHours)
+            // Accumulate spendable hours
+            val newSpendableBrainrot = (currentStats?.spendableBrainrotHours ?: 0f) + brainrotDeltaHours
+            val newSpendableMid = (currentStats?.spendableMidHours ?: 0f) + midDeltaHours
+            val newSpendableEnrichment = (currentStats?.spendableEnrichmentHours ?: 0f) + enrichmentDeltaHours
+
+            // Fetch active room objects and aggregate multipliers
+            val roomObjectDao = db.roomObjectDao()
+            val activeObjects = roomObjectDao.getActiveObjects(now)
+
+            // Expire any objects whose window has closed since last check
+            val allObjects = roomObjectDao.getAll()
+            for (obj in allObjects) {
+                if (obj.isActive && !obj.isCurrentlyActive(now)) {
+                    roomObjectDao.update(obj.copy(isActive = false))
+                }
+            }
+
+            // Aggregate multipliers (multiplicative stacking)
+            var brainrotMultiplier = 1f
+            var midMultiplier = 1f
+            var enrichmentMultiplier = 1f
+            for (obj in activeObjects) {
+                val m = obj.objectType().multipliers
+                brainrotMultiplier *= m.brainrot
+                midMultiplier *= m.mid
+                enrichmentMultiplier *= m.enrichment
+            }
+
+            val newTotalXp = XpEngine.calculateXpWithMultipliers(
+                brainrotHours = newBrainrotHours,
+                midHours = newMidHours,
+                enrichmentHours = newEnrichmentHours,
+                brainrotMultiplier = brainrotMultiplier,
+                midMultiplier = midMultiplier,
+                enrichmentMultiplier = enrichmentMultiplier
+            )
             val newLevel = XpEngine.calculateLevel(newTotalXp)
 
             val updatedStats = PlayerStats(
@@ -63,6 +98,9 @@ class UsageTrackingWorker(
                 brainrotHours = newBrainrotHours,
                 midHours = newMidHours,
                 enrichmentHours = newEnrichmentHours,
+                spendableBrainrotHours = newSpendableBrainrot,
+                spendableMidHours = newSpendableMid,
+                spendableEnrichmentHours = newSpendableEnrichment,
                 lastCheckedTimestamp = now
             )
             playerStatsDao.upsert(updatedStats)
