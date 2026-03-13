@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import com.brainrotrpg.ui.theme.BrainRotRPGTheme
 import kotlinx.coroutines.withFrameMillis
+import kotlin.math.sqrt
 
 // ---------------------------------------------------------------------------
 // Tier thresholds (hours) — tune these as needed
@@ -179,6 +180,32 @@ private fun screenToWorld(sx: Float, sy: Float, w: Float, h: Float): Pair<Float,
 }
 
 // ---------------------------------------------------------------------------
+// Proximity hit detection
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns the closest RoomObject to the tap within [thresholdWorld] world units,
+ * or null if none are close enough.
+ */
+private fun findTappedObject(
+    tapWx: Float,
+    tapWy: Float,
+    placedObjects: List<RoomObject>,
+    thresholdWorld: Float = 0.08f
+): RoomObject? {
+    return placedObjects
+        .map { obj ->
+            val dx = obj.worldX - tapWx
+            val dy = obj.worldY - tapWy
+            val dist = sqrt((dx * dx + dy * dy).toDouble()).toFloat()
+            obj to dist
+        }
+        .filter { (_, dist) -> dist < thresholdWorld }
+        .minByOrNull { (_, dist) -> dist }
+        ?.first
+}
+
+// ---------------------------------------------------------------------------
 // Main composable
 // ---------------------------------------------------------------------------
 @Composable
@@ -186,6 +213,8 @@ fun RoomScene(
     brainrotHours: Float,
     midHours: Float,
     enrichmentHours: Float,
+    placedObjects: List<RoomObject> = emptyList(),
+    onObjectTapped: (RoomObject) -> Unit = {},
     modifier: Modifier = Modifier,
     characterState: CharacterState = remember { CharacterState() }
 ) {
@@ -220,13 +249,17 @@ fun RoomScene(
             .fillMaxWidth()
             .aspectRatio(1.2f)
             // --- Tap handler ---
-            .pointerInput(Unit) {
+            .pointerInput(placedObjects) {   // key on placedObjects so handler refreshes when list changes
                 detectTapGestures { tapOffset ->
                     val w = size.width.toFloat()
                     val h = size.height.toFloat()
-                    val world = screenToWorld(tapOffset.x, tapOffset.y, w, h)
-                    if (world != null) {
-                        characterState.setTarget(world.first, world.second)
+                    val world = screenToWorld(tapOffset.x, tapOffset.y, w, h) ?: return@detectTapGestures
+
+                    val tappedObject = findTappedObject(world.first, world.second, placedObjects)
+                    if (tappedObject != null) {
+                        onObjectTapped(tappedObject)   // interaction — don't walk
+                    } else {
+                        characterState.setTarget(world.first, world.second)   // walk
                     }
                 }
             }
@@ -239,6 +272,9 @@ fun RoomScene(
         drawCategoryItems(w, h, BRAINROT_POSITIONS,    itemCount(brainrotHours),    COLOR_BRAINROT_PRIMARY,    COLOR_BRAINROT_SECONDARY)
         drawCategoryItems(w, h, ENRICHMENT_POSITIONS,  itemCount(enrichmentHours),  COLOR_ENRICHMENT_PRIMARY,  COLOR_ENRICHMENT_SECONDARY)
         drawCategoryItems(w, h, MID_POSITIONS,         itemCount(midHours),         COLOR_MID_PRIMARY,         COLOR_MID_SECONDARY)
+
+        // Placed room objects (after category items, before character — painter's order)
+        drawPlacedObjects(w, h, placedObjects)
 
         // --- Tap target indicator ---
         // Shows a faint circle at the destination while the character is walking.
@@ -431,6 +467,55 @@ private fun DrawScope.drawCategoryItems(
             topColor = color,
             sideColor = color.copy(alpha = 0.6f)
         )
+    }
+}
+
+private fun DrawScope.drawPlacedObjects(
+    w: Float,
+    h: Float,
+    objects: List<RoomObject>,
+    now: Long = System.currentTimeMillis()
+) {
+    for (obj in objects) {
+        val screenPos = worldToScreen(obj.worldX, obj.worldY, w, h)
+        val isActive = obj.isCurrentlyActive(now)
+        val size = w * 0.045f
+
+        // Base: isometric box in object's category color
+        val baseColor = when (obj.objectType().costCategory) {
+            Category.BRAINROT -> Color(0xFFCC2200)
+            Category.ENRICHMENT -> Color(0xFF2266CC)
+            Category.MID -> Color(0xFF885500)
+            Category.UNTRACKED -> Color(0xFF666666)
+        }
+
+        drawIsometricBox(
+            centerX = screenPos.x,
+            centerY = screenPos.y,
+            boxW = size,
+            boxH = size,
+            depth = size * 0.7f,
+            topColor = if (isActive) baseColor else baseColor.copy(alpha = 0.45f),
+            sideColor = if (isActive) baseColor.copy(alpha = 0.7f) else baseColor.copy(alpha = 0.25f)
+        )
+
+        // Active glow ring
+        if (isActive) {
+            drawCircle(
+                color = baseColor.copy(alpha = 0.30f),
+                radius = size * 1.4f,
+                center = screenPos
+            )
+        }
+
+        // Dormant indicator: small grey dot on top
+        if (!isActive) {
+            drawCircle(
+                color = Color(0x88AAAAAA),
+                radius = size * 0.25f,
+                center = Offset(screenPos.x, screenPos.y - size * 0.6f)
+            )
+        }
     }
 }
 
