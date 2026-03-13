@@ -101,8 +101,27 @@ class UsageTrackingWorker(
                 spendableBrainrotHours = newSpendableBrainrot,
                 spendableMidHours = newSpendableMid,
                 spendableEnrichmentHours = newSpendableEnrichment,
-                lastCheckedTimestamp = now
+                lastCheckedTimestamp = now,
+                lifecycleNumber = currentStats?.lifecycleNumber ?: 1,
+                lifecycleStartedAt = currentStats?.lifecycleStartedAt ?: now,
+                pendingLifecycleEnd = false
             )
+
+            if (LifecycleEngine.isLifecycleComplete(newTotalXp) && !(currentStats?.pendingLifecycleEnd ?: false)) {
+                // Snapshot the completed lifecycle
+                val roomObjectsPlaced = allObjects.size
+                val record = LifecycleEngine.buildRecord(updatedStats, roomObjectsPlaced, endedAt = now)
+                db.lifecycleRecordDao().insert(record)
+
+                // Mark pendingLifecycleEnd so the UI can show the end screen
+                // Do NOT reset yet — reset happens when the player taps "Begin New Life"
+                playerStatsDao.upsert(updatedStats.copy(pendingLifecycleEnd = true))
+
+                Log.d(TAG, "Lifecycle ${record.lifecycleNumber} complete. Outcome: ${record.outcome}")
+                return Result.success()
+            }
+
+            // Normal write path (lifecycle not yet complete)
             playerStatsDao.upsert(updatedStats)
 
             Log.d(TAG, "Usage tracking complete. XP: $newTotalXp, Level: $newLevel")
