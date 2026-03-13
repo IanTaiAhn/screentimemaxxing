@@ -31,4 +31,7 @@ interface RoomObjectDao {
     // Returns all objects where the active window has not yet expired
     @Query("SELECT * FROM room_objects WHERE isActive = 1 AND (activatedAt + activeDurationMs) > :now")
     suspend fun getActiveObjects(now: Long = System.currentTimeMillis()): List<RoomObject>
+
+    @Query("DELETE FROM room_objects")
+    suspend fun deleteAll()
 }

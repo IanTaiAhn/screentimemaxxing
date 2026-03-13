@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,10 +37,18 @@ import com.brainrotrpg.ui.theme.BrainRotRPGTheme
 fun AvatarScreen(
     avatarViewModel: AvatarViewModel,
     roomObjectViewModel: RoomObjectViewModel,
+    onLifecycleEnd: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by avatarViewModel.uiState.collectAsStateWithLifecycle()
+    val pendingLifecycleEnd by avatarViewModel.pendingLifecycleEnd.collectAsStateWithLifecycle()
     val placedObjects by roomObjectViewModel.placedObjects.collectAsStateWithLifecycle()
+
+    LaunchedEffect(pendingLifecycleEnd) {
+        if (pendingLifecycleEnd) {
+            onLifecycleEnd()
+        }
+    }
     val characterState = remember { CharacterState() }
 
     var placementTarget: RoomObjectType? by remember { mutableStateOf(null) }
