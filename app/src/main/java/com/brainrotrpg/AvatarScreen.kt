@@ -38,6 +38,7 @@ fun AvatarScreen(
     avatarViewModel: AvatarViewModel,
     roomObjectViewModel: RoomObjectViewModel,
     onLifecycleEnd: () -> Unit = {},
+    onArchiveClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by avatarViewModel.uiState.collectAsStateWithLifecycle()
@@ -77,6 +78,7 @@ fun AvatarScreen(
             }
         },
         onShopClick = { showShop = true },
+        onArchiveClick = onArchiveClick,
         modifier = modifier
     )
 
@@ -124,6 +126,7 @@ private fun AvatarScreenContent(
     onFloorTapped: (Float, Float) -> Unit = { _, _ -> },
     onObjectTapped: (RoomObject) -> Unit = {},
     onShopClick: () -> Unit = {},
+    onArchiveClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val avatarClassName = when (uiState.avatarState) {
@@ -231,6 +234,16 @@ private fun AvatarScreenContent(
                 .padding(16.dp)
         ) {
             Text("🛒")
+        }
+
+        // Archive FAB
+        FloatingActionButton(
+            onClick = onArchiveClick,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+        ) {
+            Text("📜")
         }
     }
 }

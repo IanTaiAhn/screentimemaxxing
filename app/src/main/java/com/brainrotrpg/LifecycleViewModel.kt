@@ -13,7 +13,8 @@ import kotlinx.coroutines.launch
 
 class LifecycleViewModel(
     private val lifecycleRecordDao: LifecycleRecordDao,
-    private val playerStatsDao: PlayerStatsDao
+    private val playerStatsDao: PlayerStatsDao,
+    private val roomObjectDao: RoomObjectDao
 ) : ViewModel() {
 
     val allRecords: StateFlow<List<LifecycleRecord>> = lifecycleRecordDao.observeAll()
@@ -37,16 +38,18 @@ class LifecycleViewModel(
             val current = playerStatsDao.getStats() ?: return@launch
             val resetStats = LifecycleEngine.resetStats(current)
             playerStatsDao.upsert(resetStats)
+            roomObjectDao.deleteAll()
         }
     }
 
     companion object {
         fun factory(
             lifecycleRecordDao: LifecycleRecordDao,
-            playerStatsDao: PlayerStatsDao
+            playerStatsDao: PlayerStatsDao,
+            roomObjectDao: RoomObjectDao
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                LifecycleViewModel(lifecycleRecordDao, playerStatsDao)
+                LifecycleViewModel(lifecycleRecordDao, playerStatsDao, roomObjectDao)
             }
         }
     }
