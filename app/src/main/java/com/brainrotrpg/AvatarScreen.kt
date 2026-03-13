@@ -1,6 +1,5 @@
 package com.brainrotrpg
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,13 +39,6 @@ private fun AvatarScreenContent(
     uiState: AvatarUiState,
     modifier: Modifier = Modifier
 ) {
-    val avatarDrawableRes = when (uiState.avatarState) {
-        is AvatarState.SigmaZombie -> R.drawable.avatar_sigma_zombie
-        is AvatarState.ExtremelyOnline -> R.drawable.avatar_extremely_online
-        is AvatarState.FakeIntellectual -> R.drawable.avatar_fake_intellectual
-        is AvatarState.Hybrid -> R.drawable.avatar_hybrid
-    }
-
     val avatarClassName = when (uiState.avatarState) {
         is AvatarState.SigmaZombie -> stringResource(R.string.avatar_class_sigma_zombie)
         is AvatarState.ExtremelyOnline -> stringResource(R.string.avatar_class_extremely_online)
@@ -57,33 +49,46 @@ private fun AvatarScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = avatarDrawableRes),
-            contentDescription = avatarClassName,
-            modifier = Modifier.size(200.dp)
+
+        // Room scene — fills the top of the screen
+        RoomScene(
+            brainrotHours = uiState.brainrotHours,
+            midHours = uiState.midHours,
+            enrichmentHours = uiState.enrichmentHours,
+            modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        Surface(
-            color = MaterialTheme.colorScheme.primaryContainer,
-            shape = MaterialTheme.shapes.small
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Level badge + class name
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(
+                    text = stringResource(R.string.level_badge, uiState.level),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+            }
             Text(
-                text = stringResource(R.string.level_badge, uiState.level),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                text = avatarClassName,
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = avatarClassName,
-            style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // XP progress bar
         LinearProgressIndicator(
             progress = { uiState.xpProgressFraction },
             modifier = Modifier.fillMaxWidth()
@@ -98,13 +103,18 @@ private fun AvatarScreenContent(
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(24.dp))
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Stats breakdown
         StatsBreakdownSection(
             brainrotHours = uiState.brainrotHours,
             midHours = uiState.midHours,
             enrichmentHours = uiState.enrichmentHours,
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -181,9 +191,9 @@ private fun AvatarScreenPreview() {
                 xpToNextLevel = 500L,
                 xpProgressFraction = 0.375f,
                 avatarState = AvatarState.SigmaZombie,
-                brainrotHours = 10f,
+                brainrotHours = 6f,
                 midHours = 2f,
-                enrichmentHours = 3f
+                enrichmentHours = 8f
             )
         )
     }
