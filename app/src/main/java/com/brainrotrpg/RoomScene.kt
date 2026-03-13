@@ -7,10 +7,13 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -18,8 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import com.brainrotrpg.ui.theme.BrainRotRPGTheme
+import kotlinx.coroutines.withFrameMillis
 
 // ---------------------------------------------------------------------------
 // Tier thresholds (hours) — tune these as needed
@@ -120,6 +125,60 @@ private fun itemCount(hours: Float): Int {
 }
 
 // ---------------------------------------------------------------------------
+// Coordinate conversion functions
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert normalised world coordinates (0f..1f each) to a canvas pixel position.
+ * The world space maps linearly onto the isometric floor diamond.
+ *
+ * wx=0 is the left corner, wx=1 is the right corner.
+ * wy=0 is the top corner, wy=1 is the bottom corner.
+ */
+private fun worldToScreen(wx: Float, wy: Float, w: Float, h: Float): Offset {
+    // Bilinear blend across the four floor corners
+    val topX    = w * 0.50f;  val topY    = h * 0.40f
+    val rightX  = w * 0.95f;  val rightY  = h * 0.62f
+    val bottomX = w * 0.50f;  val bottomY = h * 0.84f
+    val leftX   = w * 0.05f;  val leftY   = h * 0.62f
+
+    // Interpolate: wx moves left→right, wy moves top→bottom
+    val topEdgeX    = leftX   + wx * (topX    - leftX)
+    val topEdgeY    = leftY   + wx * (topY    - leftY)
+    val bottomEdgeX = leftX   + wx * (rightX  - leftX)
+    val bottomEdgeY = leftY   + wx * (rightY  - leftY)
+
+    val screenX = topEdgeX + wy * (bottomEdgeX - topEdgeX)
+    val screenY = topEdgeY + wy * (bottomEdgeY - topEdgeY)
+    return Offset(screenX, screenY)
+}
+
+/**
+ * Convert a screen-space tap position to normalised world coordinates.
+ * Returns null if the tap falls outside the isometric floor diamond.
+ */
+private fun screenToWorld(sx: Float, sy: Float, w: Float, h: Float): Pair<Float, Float>? {
+    // Centre of the floor diamond in canvas space
+    val cx = w * 0.50f
+    val cy = h * 0.62f
+
+    // Half-extents of the diamond axes
+    val halfWidth  = w * 0.45f   // left→right axis
+    val halfHeight = h * 0.22f   // top→bottom axis
+
+    val relX = (sx - cx) / halfWidth   // -1..1
+    val relY = (sy - cy) / halfHeight  // -1..1
+
+    // Standard diamond containment: |u| + |v| < 1
+    if (Math.abs(relX) + Math.abs(relY) > 0.96f) return null
+
+    // Map -1..1 → 0..1 world space
+    val wx = ((relX + 1f) / 2f).coerceIn(0.05f, 0.95f)
+    val wy = ((relY + 1f) / 2f).coerceIn(0.05f, 0.95f)
+    return Pair(wx, wy)
+}
+
+// ---------------------------------------------------------------------------
 // Main composable
 // ---------------------------------------------------------------------------
 @Composable
@@ -127,8 +186,24 @@ fun RoomScene(
     brainrotHours: Float,
     midHours: Float,
     enrichmentHours: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    characterState: CharacterState = remember { CharacterState() }
 ) {
+    // --- Physics loop ---
+    // Only active while the character is moving; zero overhead when idle.
+    LaunchedEffect(characterState.isMoving) {
+        if (!characterState.isMoving) return@LaunchedEffect
+        var lastFrameMs = 0L
+        while (characterState.isMoving) {
+            withFrameMillis { frameMs ->
+                val delta = if (lastFrameMs == 0L) 16f else (frameMs - lastFrameMs).toFloat()
+                lastFrameMs = frameMs
+                characterState.tick(delta)
+            }
+        }
+    }
+
+    // --- Breathing animation ---
     val infiniteTransition = rememberInfiniteTransition(label = "breathe")
     val breatheScale by infiniteTransition.animateFloat(
         initialValue = 0.97f,
@@ -144,44 +219,56 @@ fun RoomScene(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(1.2f)
+            // --- Tap handler ---
+            .pointerInput(Unit) {
+                detectTapGestures { tapOffset ->
+                    val w = size.width.toFloat()
+                    val h = size.height.toFloat()
+                    val world = screenToWorld(tapOffset.x, tapOffset.y, w, h)
+                    if (world != null) {
+                        characterState.setTarget(world.first, world.second)
+                    }
+                }
+            }
     ) {
         val w = size.width
         val h = size.height
 
-        // 1. Draw base room
+        // Room and items — unchanged
         drawRoom(w, h)
+        drawCategoryItems(w, h, BRAINROT_POSITIONS,    itemCount(brainrotHours),    COLOR_BRAINROT_PRIMARY,    COLOR_BRAINROT_SECONDARY)
+        drawCategoryItems(w, h, ENRICHMENT_POSITIONS,  itemCount(enrichmentHours),  COLOR_ENRICHMENT_PRIMARY,  COLOR_ENRICHMENT_SECONDARY)
+        drawCategoryItems(w, h, MID_POSITIONS,         itemCount(midHours),         COLOR_MID_PRIMARY,         COLOR_MID_SECONDARY)
 
-        // 2. Draw accumulated category items
-        drawCategoryItems(
-            w, h,
-            BRAINROT_POSITIONS,
-            itemCount(brainrotHours),
-            COLOR_BRAINROT_PRIMARY,
-            COLOR_BRAINROT_SECONDARY
-        )
-        drawCategoryItems(
-            w, h,
-            ENRICHMENT_POSITIONS,
-            itemCount(enrichmentHours),
-            COLOR_ENRICHMENT_PRIMARY,
-            COLOR_ENRICHMENT_SECONDARY
-        )
-        drawCategoryItems(
-            w, h,
-            MID_POSITIONS,
-            itemCount(midHours),
-            COLOR_MID_PRIMARY,
-            COLOR_MID_SECONDARY
-        )
+        // --- Tap target indicator ---
+        // Shows a faint circle at the destination while the character is walking.
+        if (characterState.isMoving) {
+            val target = worldToScreen(characterState.targetX, characterState.targetY, w, h)
+            drawCircle(
+                color = Color.White.copy(alpha = 0.35f),
+                radius = w * 0.018f,
+                center = target
+            )
+            // Crosshair lines
+            val r = w * 0.025f
+            drawLine(Color.White.copy(alpha = 0.25f), target - Offset(r, 0f), target + Offset(r, 0f), strokeWidth = 1.5f)
+            drawLine(Color.White.copy(alpha = 0.25f), target - Offset(0f, r), target + Offset(0f, r), strokeWidth = 1.5f)
+        }
 
-        // 3. Draw character with breathing animation, centered in room
-        val charCenterX = w * 0.50f
-        val charCenterY = h * 0.60f
-        scale(
-            scale = breatheScale,
-            pivot = Offset(charCenterX, charCenterY)
-        ) {
-            drawCharacter(charCenterX, charCenterY, w)
+        // --- Character (updated position with walking bob) ---
+        val charPos = worldToScreen(characterState.worldX, characterState.worldY, w, h)
+
+        // Walking bob: offset the character vertically using a sine wave driven by world position
+        val bobOffset = if (characterState.isMoving) {
+            val phase = (characterState.worldX + characterState.worldY) * 40f  // position-driven phase
+            Math.sin(phase.toDouble()).toFloat() * w * 0.008f
+        } else 0f
+
+        val animScale = if (characterState.isMoving) 1.0f else breatheScale
+        val animPivot = charPos
+
+        scale(scale = animScale, pivot = animPivot) {
+            drawCharacter(charPos.x, charPos.y + bobOffset, w)
         }
     }
 }
