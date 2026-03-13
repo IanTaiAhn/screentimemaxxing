@@ -15,5 +15,8 @@ data class PlayerStats(
     val spendableBrainrotHours: Float = 0f,   // spendable currency
     val spendableMidHours: Float = 0f,
     val spendableEnrichmentHours: Float = 0f,
-    val lastCheckedTimestamp: Long
+    val lastCheckedTimestamp: Long,
+    val lifecycleNumber: Int = 1,           // which life this is
+    val lifecycleStartedAt: Long = 0L,      // timestamp when this life began
+    val pendingLifecycleEnd: Boolean = false // true when lifecycle has just ended, awaiting player acknowledgment
 )

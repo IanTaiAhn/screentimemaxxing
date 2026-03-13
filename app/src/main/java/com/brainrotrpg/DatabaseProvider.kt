@@ -24,6 +24,38 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            CREATE TABLE IF NOT EXISTS lifecycle_records (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                lifecycleNumber INTEGER NOT NULL,
+                outcome TEXT NOT NULL,
+                finalAvatarClass TEXT NOT NULL,
+                totalXp INTEGER NOT NULL,
+                finalLevel INTEGER NOT NULL,
+                brainrotHours REAL NOT NULL,
+                midHours REAL NOT NULL,
+                enrichmentHours REAL NOT NULL,
+                totalHours REAL NOT NULL,
+                roomObjectsPlaced INTEGER NOT NULL,
+                startedAt INTEGER NOT NULL,
+                endedAt INTEGER NOT NULL
+            )
+        """)
+        // Track when the current life started (default to 0 for existing installs)
+        database.execSQL(
+            "ALTER TABLE player_stats ADD COLUMN lifecycleNumber INTEGER NOT NULL DEFAULT 1"
+        )
+        database.execSQL(
+            "ALTER TABLE player_stats ADD COLUMN lifecycleStartedAt INTEGER NOT NULL DEFAULT 0"
+        )
+        database.execSQL(
+            "ALTER TABLE player_stats ADD COLUMN pendingLifecycleEnd INTEGER NOT NULL DEFAULT 0"
+        )
+    }
+}
+
 object DatabaseProvider {
     private const val DATABASE_NAME = "brainrot_rpg.db"
 
@@ -37,7 +69,7 @@ object DatabaseProvider {
                 AppDatabase::class.java,
                 DATABASE_NAME
             )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build().also { instance = it }
         }
     }
