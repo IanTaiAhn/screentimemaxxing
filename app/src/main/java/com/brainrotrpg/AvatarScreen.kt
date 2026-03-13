@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -31,12 +32,14 @@ fun AvatarScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by avatarViewModel.uiState.collectAsStateWithLifecycle()
-    AvatarScreenContent(uiState = uiState, modifier = modifier)
+    val characterState = remember { CharacterState() }
+    AvatarScreenContent(uiState = uiState, characterState = characterState, modifier = modifier)
 }
 
 @Composable
 private fun AvatarScreenContent(
     uiState: AvatarUiState,
+    characterState: CharacterState = remember { CharacterState() },
     modifier: Modifier = Modifier
 ) {
     val avatarClassName = when (uiState.avatarState) {
@@ -59,7 +62,8 @@ private fun AvatarScreenContent(
             brainrotHours = uiState.brainrotHours,
             midHours = uiState.midHours,
             enrichmentHours = uiState.enrichmentHours,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            characterState = characterState
         )
 
         Spacer(modifier = Modifier.height(12.dp))
