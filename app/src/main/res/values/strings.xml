@@ -15,4 +15,18 @@
     <string name="stat_mid">😐 Mid</string>
     <string name="stat_enrichment">🎧 Enrichment</string>
     <string name="stat_hours">%.1f hrs</string>
+    <string name="lifecycle_end_title">Life %d — %s</string>
+    <string name="lifecycle_begin_new">Begin New Life</string>
+    <string name="lifecycle_view_archive">View Archive</string>
+    <string name="archive_title">Archive</string>
+    <string name="archive_empty">No lives completed yet.</string>
+    <string name="outcome_graduate_name">Graduate</string>
+    <string name="outcome_die_name">Die</string>
+    <string name="outcome_ascend_name">Ascend</string>
+    <string name="outcome_graduate_desc">You consumed enough culture to escape the feed.</string>
+    <string name="outcome_die_desc">The brainrot consumed you. There was nothing left.</string>
+    <string name="outcome_ascend_desc">Extremely online. Deeply chronically. You became the internet.</string>
+    <string name="lifecycle_stat_total_hours">Total Hours</string>
+    <string name="lifecycle_stat_avatar_class">Avatar Class</string>
+    <string name="lifecycle_stat_objects_placed">Objects Placed</string>
 </resources>
