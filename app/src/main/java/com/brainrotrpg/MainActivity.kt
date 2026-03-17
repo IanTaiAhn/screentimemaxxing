@@ -105,7 +105,10 @@ fun BrainRotNavHost(modifier: Modifier = Modifier) {
             val viewModel: LifecycleViewModel = viewModel(
                 factory = LifecycleViewModel.factory(lifecycleRecordDao, db.playerStatsDao(), db.roomObjectDao())
             )
-            ArchiveScreen(viewModel = viewModel)
+            ArchiveScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.popBackStack() }
+            )
         }
     }
 }

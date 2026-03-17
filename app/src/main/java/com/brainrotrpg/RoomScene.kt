@@ -23,8 +23,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.withFrameMillis
 import com.brainrotrpg.ui.theme.BrainRotRPGTheme
-import kotlinx.coroutines.withFrameMillis
 import kotlin.math.sqrt
 
 // ---------------------------------------------------------------------------
@@ -133,24 +133,19 @@ private fun itemCount(hours: Float): Int {
  * Convert normalised world coordinates (0f..1f each) to a canvas pixel position.
  * The world space maps linearly onto the isometric floor diamond.
  *
- * wx=0 is the left corner, wx=1 is the right corner.
- * wy=0 is the top corner, wy=1 is the bottom corner.
+ * wx controls left-right position (0 = left corner, 1 = right corner)
+ * wy controls top-bottom position (0 = top corner, 1 = bottom corner)
  */
 private fun worldToScreen(wx: Float, wy: Float, w: Float, h: Float): Offset {
-    // Bilinear blend across the four floor corners
-    val topX    = w * 0.50f;  val topY    = h * 0.40f
-    val rightX  = w * 0.95f;  val rightY  = h * 0.62f
-    val bottomX = w * 0.50f;  val bottomY = h * 0.84f
-    val leftX   = w * 0.05f;  val leftY   = h * 0.62f
+    // Diamond center and half-extents
+    val centerX = w * 0.50f
+    val centerY = h * 0.62f
+    val halfWidth = w * 0.45f   // distance from center to left/right corners
+    val halfHeight = h * 0.22f  // distance from center to top/bottom corners
 
-    // Interpolate: wx moves left→right, wy moves top→bottom
-    val topEdgeX    = leftX   + wx * (topX    - leftX)
-    val topEdgeY    = leftY   + wx * (topY    - leftY)
-    val bottomEdgeX = leftX   + wx * (rightX  - leftX)
-    val bottomEdgeY = leftY   + wx * (rightY  - leftY)
-
-    val screenX = topEdgeX + wy * (bottomEdgeX - topEdgeX)
-    val screenY = topEdgeY + wy * (bottomEdgeY - topEdgeY)
+    // Map world coordinates to screen using diamond geometry
+    val screenX = centerX + (wx - 0.5f) * 2f * halfWidth
+    val screenY = centerY + (wy - 0.5f) * 2f * halfHeight
     return Offset(screenX, screenY)
 }
 
@@ -159,23 +154,22 @@ private fun worldToScreen(wx: Float, wy: Float, w: Float, h: Float): Offset {
  * Returns null if the tap falls outside the isometric floor diamond.
  */
 private fun screenToWorld(sx: Float, sy: Float, w: Float, h: Float): Pair<Float, Float>? {
-    // Centre of the floor diamond in canvas space
-    val cx = w * 0.50f
-    val cy = h * 0.62f
+    // Diamond center and half-extents
+    val centerX = w * 0.50f
+    val centerY = h * 0.62f
+    val halfWidth = w * 0.45f   // distance from center to left/right corners
+    val halfHeight = h * 0.22f  // distance from center to top/bottom corners
 
-    // Half-extents of the diamond axes
-    val halfWidth  = w * 0.45f   // left→right axis
-    val halfHeight = h * 0.22f   // top→bottom axis
+    // Convert to relative coordinates (-1..1)
+    val relX = (sx - centerX) / halfWidth
+    val relY = (sy - centerY) / halfHeight
 
-    val relX = (sx - cx) / halfWidth   // -1..1
-    val relY = (sy - cy) / halfHeight  // -1..1
+    // Diamond containment check: |relX| + |relY| <= 1
+    if (Math.abs(relX) + Math.abs(relY) > 1.0f) return null
 
-    // Standard diamond containment: |u| + |v| < 1
-    if (Math.abs(relX) + Math.abs(relY) > 0.96f) return null
-
-    // Map -1..1 → 0..1 world space
-    val wx = ((relX + 1f) / 2f).coerceIn(0.05f, 0.95f)
-    val wy = ((relY + 1f) / 2f).coerceIn(0.05f, 0.95f)
+    // Convert relative coordinates to world space (0..1)
+    val wx = (0.5f + relX * 0.5f).coerceIn(0.0f, 1.0f)
+    val wy = (0.5f + relY * 0.5f).coerceIn(0.0f, 1.0f)
     return Pair(wx, wy)
 }
 
