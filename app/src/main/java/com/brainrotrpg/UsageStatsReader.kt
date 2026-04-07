@@ -2,15 +2,11 @@ package com.brainrotrpg
 
 import android.app.usage.UsageStatsManager
 import android.content.Context
-import android.util.Log
 
 object UsageStatsReader : IUsageStatsReader {
 
-    private const val TAG = "UsageStatsReader"
-
     override fun getUsageSince(context: Context, sinceMillis: Long): Map<String, Long> {
         if (!UsagePermissionHelper.hasUsagePermission(context)) {
-            Log.w(TAG, "Usage stats permission not granted. Returning empty map.")
             return emptyMap()
         }
 

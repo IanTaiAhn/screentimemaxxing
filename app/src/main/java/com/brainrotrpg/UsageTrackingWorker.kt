@@ -1,7 +1,6 @@
 package com.brainrotrpg
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 
@@ -11,7 +10,6 @@ class UsageTrackingWorker(
 ) : CoroutineWorker(context, params) {
 
     companion object {
-        private const val TAG = "UsageTrackingWorker"
         private const val MS_PER_HOUR = 3_600_000f
         private const val DEFAULT_LOOKBACK_MS = 24 * 60 * 60 * 1000L // 24 hours
     }
@@ -117,17 +115,14 @@ class UsageTrackingWorker(
                 // Do NOT reset yet — reset happens when the player taps "Begin New Life"
                 playerStatsDao.upsert(updatedStats.copy(pendingLifecycleEnd = true))
 
-                Log.d(TAG, "Lifecycle ${record.lifecycleNumber} complete. Outcome: ${record.outcome}")
                 return Result.success()
             }
 
             // Normal write path (lifecycle not yet complete)
             playerStatsDao.upsert(updatedStats)
 
-            Log.d(TAG, "Usage tracking complete. XP: $newTotalXp, Level: $newLevel")
             Result.success()
         } catch (e: Exception) {
-            Log.e(TAG, "Usage tracking failed, will retry", e)
             Result.retry()
         }
     }

@@ -68,8 +68,8 @@ We may update this privacy policy from time to time. Any changes will be reflect
 
 If you have questions about this privacy policy, please contact:
 
-**Email:** [Your email address]
-**GitHub:** https://github.com/[your-username]/screentimemaxxing
+**Email:** iantaiahn@yahoo.com
+**GitHub:** https://github.com/IanTaiAhn/screentimemaxxing
 
 ---
 
